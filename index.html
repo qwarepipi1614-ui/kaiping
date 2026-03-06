@@ -375,12 +375,180 @@ body {
 }
 .back-btn:hover { background: var(--blue); color: white; }
 
+/* ── Password Modal ── */
+.pw-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+}
+.pw-overlay.show { display: flex; }
+
+.pw-modal {
+  background: white;
+  border-radius: 10px;
+  padding: 32px 28px 24px;
+  width: 340px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+  text-align: center;
+  animation: pwIn 0.2s ease;
+}
+
+@keyframes pwIn {
+  from { opacity: 0; transform: scale(0.92) translateY(-12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.pw-icon { font-size: 36px; margin-bottom: 10px; }
+.pw-title { font-size: 17px; font-weight: 700; color: var(--blue); margin-bottom: 6px; }
+.pw-subtitle { font-size: 13px; color: #888; margin-bottom: 20px; }
+
+.pw-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-size: 15px;
+  font-family: 'Noto Sans TC', sans-serif;
+  outline: none;
+  text-align: center;
+  letter-spacing: 0.15em;
+  color: var(--text);
+  transition: border-color 0.15s;
+  margin-bottom: 8px;
+}
+.pw-input:focus { border-color: var(--blue); }
+.pw-input.error { border-color: #e53935; animation: shake 0.3s ease; }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+.pw-error { font-size: 12px; color: #e53935; height: 16px; margin-bottom: 14px; }
+
+.pw-actions { display: flex; gap: 10px; justify-content: center; }
+.pw-submit {
+  padding: 9px 28px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Noto Sans TC', sans-serif;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+.pw-submit:hover { background: var(--blue-hover); }
+.pw-cancel-btn {
+  padding: 9px 20px;
+  background: #f0f0f0;
+  color: #666;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Noto Sans TC', sans-serif;
+  transition: background 0.15s;
+}
+.pw-cancel-btn:hover { background: #e0e0e0; }
+
 .empty-hint {
   padding: 18px;
   text-align: center;
   color: #aaa;
   font-size: 13px;
 }
+
+/* ── Password Modal ── */
+.pw-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+}
+.pw-overlay.show { display: flex; }
+
+.pw-modal {
+  background: white;
+  border-radius: 10px;
+  padding: 32px 28px 24px;
+  width: 340px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+  text-align: center;
+  animation: pwIn 0.2s ease;
+}
+
+@keyframes pwIn {
+  from { opacity: 0; transform: scale(0.92) translateY(-12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.pw-icon { font-size: 36px; margin-bottom: 10px; }
+.pw-title { font-size: 17px; font-weight: 700; color: var(--blue); margin-bottom: 6px; }
+.pw-subtitle { font-size: 13px; color: #888; margin-bottom: 20px; }
+
+.pw-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-size: 15px;
+  font-family: 'Noto Sans TC', sans-serif;
+  outline: none;
+  text-align: center;
+  letter-spacing: 0.15em;
+  color: var(--text);
+  transition: border-color 0.15s;
+  margin-bottom: 8px;
+}
+.pw-input:focus { border-color: var(--blue); }
+.pw-input.error { border-color: #e53935; animation: shake 0.3s ease; }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+.pw-error { font-size: 12px; color: #e53935; height: 16px; margin-bottom: 14px; }
+
+.pw-actions { display: flex; gap: 10px; justify-content: center; }
+.pw-submit {
+  padding: 9px 28px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Noto Sans TC', sans-serif;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+.pw-submit:hover { background: var(--blue-hover); }
+.pw-cancel-btn {
+  padding: 9px 20px;
+  background: #f0f0f0;
+  color: #666;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Noto Sans TC', sans-serif;
+  transition: background 0.15s;
+}
+.pw-cancel-btn:hover { background: #e0e0e0; }
 </style>
 </head>
 <body>
@@ -690,7 +858,41 @@ function cancelEdit() {
 }
 
 // ── Navigation ──
+const ADMIN_PW = 'pipi1614';
+let isAuthed = false;
+
 function showAdmin() {
+  if (isAuthed) {
+    openAdminPage();
+  } else {
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-error').textContent = '';
+    document.getElementById('pw-overlay').classList.add('show');
+    setTimeout(() => document.getElementById('pw-input').focus(), 100);
+  }
+}
+
+function checkPw() {
+  const val = document.getElementById('pw-input').value;
+  if (val === ADMIN_PW) {
+    isAuthed = true;
+    closePwModal();
+    openAdminPage();
+    showToast('\uD83D\uDD13 已登入管理系統');
+  } else {
+    const input = document.getElementById('pw-input');
+    input.classList.add('error');
+    document.getElementById('pw-error').textContent = '密碼錯誤，請再試一次';
+    input.value = '';
+    setTimeout(() => input.focus(), 50);
+  }
+}
+
+function closePwModal() {
+  document.getElementById('pw-overlay').classList.remove('show');
+}
+
+function openAdminPage() {
   document.getElementById('main-page').style.display = 'none';
   document.getElementById('admin-page').style.display = 'block';
   document.getElementById('manage-btn').style.display = 'none';
@@ -703,10 +905,29 @@ function showMain() {
   document.getElementById('admin-page').style.display = 'none';
   document.getElementById('manage-btn').style.display = 'inline-block';
   document.getElementById('back-btn').style.display = 'none';
+  isAuthed = false;
 }
 
 // ── Init ──
 renderMain();
 </script>
+
+<!-- Password Modal -->
+<div class="pw-overlay" id="pw-overlay">
+  <div class="pw-modal">
+    <div class="pw-icon">&#x1F512;</div>
+    <div class="pw-title">管理員驗證</div>
+    <div class="pw-subtitle">請輸入密碼以進入管理系統</div>
+    <input class="pw-input" type="password" id="pw-input" placeholder="&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;"
+      onkeydown="if(event.key==='Enter')checkPw()"
+      oninput="this.classList.remove('error');document.getElementById('pw-error').textContent=''">
+    <div class="pw-error" id="pw-error"></div>
+    <div class="pw-actions">
+      <button class="pw-cancel-btn" onclick="closePwModal()">取消</button>
+      <button class="pw-submit" onclick="checkPw()">確認登入</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
