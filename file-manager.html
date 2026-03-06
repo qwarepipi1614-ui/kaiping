@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>檔案管理系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #0d1b2a;
+  --navy2: #152236;
+  --navy3: #1e3050;
+  --blue: #1a73e8;
+  --blue-light: #4a9af5;
+  --cyan: #00c2d1;
+  --text: #e8edf4;
+  --text-muted: #7a93b0;
+  --border: #243a52;
+  --danger: #e8394a;
+  --success: #2ed47a;
+  --warning: #f5a623;
+  --surface: #152236;
+  --row-hover: #1e3050;
+}
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--navy);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Top Bar ── */
+.topbar {
+  background: var(--navy2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cyan);
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-dot { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; }
+
+.topbar-sep { width: 1px; height: 22px; background: var(--border); }
+
+.topbar-title {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.user-avatar {
+  width: 30px; height: 30px;
+  background: var(--blue);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+}
+
+/* ── Layout ── */
+.layout {
+  display: flex;
+  flex: 1;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 220px;
+  background: var(--navy2);
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-section {
+  padding: 6px 18px 2px;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 18px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+  user-select: none;
+}
+
+.sidebar-item:hover { background: var(--navy3); color: var(--text); }
+.sidebar-item.active { background: var(--navy3); color: var(--cyan); border-left-color: var(--cyan); }
+
+.sidebar-item .icon { font-size: 15px; width: 18px; text-align: center; }
+
+.sidebar-count {
+  margin-left: auto;
+  background: var(--navy3);
+  border-radius: 10px;
+  font-size: 11px;
+  padding: 1px 7px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+}
+
+.sidebar-item.active .sidebar-count { background: rgba(0,194,209,0.15); color: var(--cyan); }
+
+/* ── Main ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Toolbar ── */
+.toolbar {
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  background: var(--navy2);
+  flex-wrap: wrap;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.breadcrumb span { color: var(--text); }
+.breadcrumb .sep { opacity: 0.4; }
+
+.toolbar-actions { display: flex; gap: 8px; align-items: center; }
+
+.btn {
+  padding: 7px 14px;
+  font-size: 13px;
+  font-family: 'Noto Sans TC', sans-serif;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn-primary { background: var(--blue); color: white; }
+.btn-primary:hover { background: var(--blue-light); }
+
+.btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--navy3); color: var(--text); }
+
+.btn-danger { background: rgba(232,57,74,0.15); color: var(--danger); border: 1px solid rgba(232,57,74,0.3); }
+.btn-danger:hover { background: rgba(232,57,74,0.25); }
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--navy);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 12px;
+}
+
+.search-box input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 13px;
+  font-family: 'Noto Sans TC', sans-serif;
+  width: 180px;
+}
+
+.search-box input::placeholder { color: var(--text-muted); }
+
+/* ── Stats Bar ── */
+.stats-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-item {
+  flex: 1;
+  padding: 14px 20px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.stat-item:last-child { border-right: none; }
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text);
+}
+
+.stat-value.blue { color: var(--blue-light); }
+.stat-value.cyan { color: var(--cyan); }
+.stat-value.warn { color: var(--warning); }
+
+/* ── File Table ── */
+.table-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.table-wrap::-webkit-scrollbar { width: 5px; }
+.table-wrap::-webkit-scrollbar-track { background: transparent; }
+.table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+thead {
+  position: sticky;
+  top: 0;
+  background: var(--navy2);
+  z-index: 10;
+}
+
+th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 400;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+th:hover { color: var(--text); }
+th.sort-asc::after { content: ' ↑'; color: var(--cyan); }
+th.sort-desc::after { content: ' ↓'; color: var(--cyan); }
+
+td {
+  padding: 11px 16px;
+  border-bottom: 1px solid rgba(36,58,82,0.6);
+  vertical-align: middle;
+  color: var(--text);
+}
+
+tr:hover td { background: var(--row-hover); }
+
+tr.selected td { background: rgba(26,115,232,0.12); }
+
+.cb { width: 16px; height: 16px; cursor: pointer; accent-color: var(--blue); }
+
+.file-icon { font-size: 18px; }
+
+.file-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.file-name-text:hover { color: var(--blue-light); text-decoration: underline; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+
+.badge-pdf   { background: rgba(232,57,74,0.15); color: #f47a84; }
+.badge-xls   { background: rgba(46,212,122,0.15); color: var(--success); }
+.badge-doc   { background: rgba(26,115,232,0.15); color: var(--blue-light); }
+.badge-zip   { background: rgba(245,166,35,0.15); color: var(--warning); }
+.badge-img   { background: rgba(0,194,209,0.15);  color: var(--cyan); }
+.badge-txt   { background: rgba(122,147,176,0.15); color: var(--text-muted); }
+.badge-ppt   { background: rgba(232,115,26,0.15); color: #f5a04a; }
+
+.size-text { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); }
+.date-text { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); }
+
+.row-actions { display: flex; gap: 6px; opacity: 0; transition: opacity 0.15s; }
+tr:hover .row-actions { opacity: 1; }
+
+.icon-btn {
+  width: 28px; height: 28px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.icon-btn.dl  { background: rgba(26,115,232,0.2); color: var(--blue-light); }
+.icon-btn.dl:hover  { background: rgba(26,115,232,0.4); }
+.icon-btn.del { background: rgba(232,57,74,0.2);  color: var(--danger); }
+.icon-btn.del:hover { background: rgba(232,57,74,0.4); }
+.icon-btn.edit { background: rgba(245,166,35,0.2); color: var(--warning); }
+.icon-btn.edit:hover { background: rgba(245,166,35,0.4); }
+
+/* ── Status bar ── */
+.statusbar {
+  padding: 8px 24px;
+  border-top: 1px solid var(--border);
+  background: var(--navy2);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.statusbar-sel { color: var(--cyan); }
+
+/* ── Upload modal ── */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.overlay.show { display: flex; }
+
+.modal {
+  background: var(--navy2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 460px;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: modalIn 0.2s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: 6px;
+  padding: 36px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 16px;
+}
+
+.drop-zone:hover, .drop-zone.drag { border-color: var(--cyan); background: rgba(0,194,209,0.06); }
+.drop-zone .dz-icon { font-size: 36px; margin-bottom: 10px; }
+.drop-zone .dz-text { color: var(--text-muted); font-size: 14px; }
+.drop-zone .dz-text b { color: var(--cyan); cursor: pointer; }
+
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+tbody tr { animation: fadeIn 0.25s ease backwards; }
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--navy3);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--success);
+  padding: 12px 18px;
+  border-radius: 4px;
+  font-size: 13px;
+  z-index: 999;
+  display: none;
+  animation: fadeIn 0.2s ease;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--success);
+}
+
+.toast.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="logo"><div class="logo-dot"></div>ibon · MGMT</div>
+  <div class="topbar-sep"></div>
+  <div class="topbar-title">檔案管理系統</div>
+  <div class="topbar-right">
+    <div class="user-badge">
+      <div class="user-avatar">管</div>
+      <span>管理員</span>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-section">目錄</div>
+    <div class="sidebar-item active" onclick="filterCategory('all')">
+      <span class="icon">📁</span> 全部檔案
+      <span class="sidebar-count" id="cnt-all">12</span>
+    </div>
+    <div class="sidebar-item" onclick="filterCategory('doc')">
+      <span class="icon">📄</span> 文件
+      <span class="sidebar-count" id="cnt-doc">4</span>
+    </div>
+    <div class="sidebar-item" onclick="filterCategory('xls')">
+      <span class="icon">📊</span> 試算表
+      <span class="sidebar-count" id="cnt-xls">3</span>
+    </div>
+    <div class="sidebar-item" onclick="filterCategory('img')">
+      <span class="icon">🖼️</span> 圖片
+      <span class="sidebar-count" id="cnt-img">2</span>
+    </div>
+    <div class="sidebar-item" onclick="filterCategory('zip')">
+      <span class="icon">📦</span> 壓縮檔
+      <span class="sidebar-count" id="cnt-zip">2</span>
+    </div>
+    <div class="sidebar-item" onclick="filterCategory('other')">
+      <span class="icon">📎</span> 其他
+      <span class="sidebar-count" id="cnt-other">1</span>
+    </div>
+
+    <div class="sidebar-section" style="margin-top:16px">儲存空間</div>
+    <div style="padding: 8px 18px;">
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;font-family:'JetBrains Mono',monospace;">48.3 MB / 1 GB</div>
+      <div style="background:var(--navy3);border-radius:3px;height:5px;overflow:hidden;">
+        <div style="background:linear-gradient(90deg,var(--blue),var(--cyan));width:5%;height:100%;border-radius:3px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="breadcrumb">
+        🏠 <span class="sep">/</span> <span>全部檔案</span>
+      </div>
+      <div class="toolbar-actions">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="search-input" placeholder="搜尋檔案..." oninput="doSearch()">
+        </div>
+        <button class="btn btn-ghost" onclick="toggleView()">⊞ 切換</button>
+        <button class="btn btn-primary" onclick="document.getElementById('overlay').classList.add('show')">
+          ＋ 上傳檔案
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-label">總檔案數</div>
+        <div class="stat-value blue" id="stat-total">12</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">已選取</div>
+        <div class="stat-value cyan" id="stat-selected">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">總大小</div>
+        <div class="stat-value">48.3 MB</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">最後更新</div>
+        <div class="stat-value warn" style="font-size:14px;">2025-03-06</div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:36px"><input type="checkbox" class="cb" id="check-all" onchange="toggleAll(this)"></th>
+            <th onclick="sortBy('name')" id="th-name">檔案名稱</th>
+            <th onclick="sortBy('type')" id="th-type">類型</th>
+            <th onclick="sortBy('size')" id="th-size">大小</th>
+            <th onclick="sortBy('date')" id="th-date">上傳日期</th>
+            <th onclick="sortBy('uploader')" id="th-uploader">上傳者</th>
+            <th style="width:100px">操作</th>
+          </tr>
+        </thead>
+        <tbody id="file-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="statusbar">
+      <span id="status-text">共 12 個檔案</span>
+      <span id="status-sel" class="statusbar-sel"></span>
+      <span style="margin-left:auto">篩選中: <span id="filter-label">全部</span></span>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="overlay" id="overlay" onclick="closeOverlay(event)">
+  <div class="modal">
+    <div class="modal-title">📤 上傳檔案</div>
+    <div class="drop-zone" id="drop-zone"
+         ondragover="event.preventDefault();this.classList.add('drag')"
+         ondragleave="this.classList.remove('drag')"
+         ondrop="handleDrop(event)"
+         onclick="document.getElementById('file-input').click()">
+      <div class="dz-icon">☁️</div>
+      <div class="dz-text">拖曳檔案到這裡，或 <b>點擊選擇</b></div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">支援所有格式 · 最大 50MB</div>
+    </div>
+    <input type="file" id="file-input" multiple style="display:none" onchange="handleFileSelect(this)">
+    <div id="upload-list" style="font-size:13px;color:var(--text-muted);"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="document.getElementById('overlay').classList.remove('show')">取消</button>
+      <button class="btn btn-primary" onclick="confirmUpload()">確認上傳</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const typeIcon = {
+  pdf: '📕', xls: '📗', xlsx: '📗', doc: '📘', docx: '📘',
+  zip: '📦', rar: '📦', png: '🖼️', jpg: '🖼️', jpeg: '🖼️',
+  gif: '🖼️', ppt: '📙', pptx: '📙', txt: '📃', csv: '📊'
+};
+
+const typeBadge = {
+  pdf: 'badge-pdf', xls: 'badge-xls', xlsx: 'badge-xls', doc: 'badge-doc',
+  docx: 'badge-doc', zip: 'badge-zip', rar: 'badge-zip',
+  png: 'badge-img', jpg: 'badge-img', jpeg: 'badge-img', gif: 'badge-img',
+  ppt: 'badge-ppt', pptx: 'badge-ppt', txt: 'badge-txt', csv: 'badge-xls'
+};
+
+const typeCategory = {
+  pdf: 'doc', doc: 'doc', docx: 'doc', txt: 'doc',
+  xls: 'xls', xlsx: 'xls', csv: 'xls',
+  png: 'img', jpg: 'img', jpeg: 'img', gif: 'img',
+  zip: 'zip', rar: 'zip',
+  ppt: 'other', pptx: 'other'
+};
+
+let files = [
+  { id:1, name:'2025年Q1營業報告.pdf',    type:'pdf',  size:'3.2 MB',  sizeB:3355443, date:'2025-03-01', uploader:'王小明' },
+  { id:2, name:'門市銷售統計表.xlsx',      type:'xlsx', size:'1.8 MB',  sizeB:1887437, date:'2025-03-02', uploader:'林美玲' },
+  { id:3, name:'系統操作手冊v3.docx',      type:'docx', size:'5.4 MB',  sizeB:5662310, date:'2025-02-28', uploader:'陳建宏' },
+  { id:4, name:'門市照片_台北店.jpg',      type:'jpg',  size:'2.1 MB',  sizeB:2202009, date:'2025-02-25', uploader:'王小明' },
+  { id:5, name:'系統備份_0301.zip',        type:'zip',  size:'18.6 MB', sizeB:19503821, date:'2025-03-01', uploader:'系統管理員' },
+  { id:6, name:'客服問題記錄.xlsx',         type:'xlsx', size:'980 KB',  sizeB:1003520, date:'2025-02-20', uploader:'林美玲' },
+  { id:7, name:'2025年行銷計畫.pptx',      type:'pptx', size:'8.7 MB',  sizeB:9123456, date:'2025-02-18', uploader:'張怡君' },
+  { id:8, name:'合約範本_2025.docx',       type:'docx', size:'420 KB',  sizeB:430080,  date:'2025-01-15', uploader:'陳建宏' },
+  { id:9, name:'商品目錄.pdf',             type:'pdf',  size:'4.5 MB',  sizeB:4718592, date:'2025-01-10', uploader:'張怡君' },
+  { id:10,name:'門市logo.png',             type:'png',  size:'560 KB',  sizeB:573440,  date:'2024-12-20', uploader:'設計部' },
+  { id:11,name:'資料匯出_2025Q4.zip',      type:'zip',  size:'2.2 MB',  sizeB:2306867, date:'2024-12-15', uploader:'系統管理員' },
+  { id:12,name:'README.txt',               type:'txt',  size:'8 KB',    sizeB:8192,    date:'2024-11-01', uploader:'陳建宏' },
+];
+
+let currentFilter = 'all';
+let currentSearch = '';
+let sortCol = 'date';
+let sortDir = 'desc';
+let selected = new Set();
+
+function getFiltered() {
+  return files.filter(f => {
+    const cat = typeCategory[f.type] || 'other';
+    const matchCat = currentFilter === 'all' || cat === currentFilter;
+    const matchSearch = !currentSearch ||
+      f.name.toLowerCase().includes(currentSearch.toLowerCase()) ||
+      f.uploader.includes(currentSearch);
+    return matchCat && matchSearch;
+  }).sort((a, b) => {
+    let va = a[sortCol], vb = b[sortCol];
+    if (sortCol === 'size') { va = a.sizeB; vb = b.sizeB; }
+    const cmp = String(va).localeCompare(String(vb), 'zh-TW');
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
+}
+
+function render() {
+  const tbody = document.getElementById('file-tbody');
+  const list = getFiltered();
+  tbody.innerHTML = '';
+
+  list.forEach((f, i) => {
+    const ext = f.type.toUpperCase();
+    const icon = typeIcon[f.type] || '📄';
+    const badge = typeBadge[f.type] || 'badge-txt';
+    const isSel = selected.has(f.id);
+    const tr = document.createElement('tr');
+    if (isSel) tr.classList.add('selected');
+    tr.style.animationDelay = (i * 0.03) + 's';
+    tr.innerHTML = `
+      <td><input type="checkbox" class="cb" ${isSel?'checked':''} onchange="toggleRow(${f.id},this)"></td>
+      <td>
+        <div class="file-name">
+          <span class="file-icon">${icon}</span>
+          <span class="file-name-text" title="${f.name}">${f.name}</span>
+        </div>
+      </td>
+      <td><span class="badge ${badge}">${ext}</span></td>
+      <td><span class="size-text">${f.size}</span></td>
+      <td><span class="date-text">${f.date}</span></td>
+      <td><span style="font-size:13px">${f.uploader}</span></td>
+      <td>
+        <div class="row-actions">
+          <button class="icon-btn dl" title="下載" onclick="toast('下載：${f.name}')">⬇</button>
+          <button class="icon-btn edit" title="重新命名" onclick="renameFile(${f.id})">✏️</button>
+          <button class="icon-btn del" title="刪除" onclick="deleteFile(${f.id})">🗑</button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('stat-total').textContent = list.length;
+  document.getElementById('stat-selected').textContent = selected.size;
+  document.getElementById('status-text').textContent = `共 ${list.length} 個檔案`;
+  document.getElementById('status-sel').textContent = selected.size ? `・已選 ${selected.size} 個` : '';
+  updateCounts();
+}
+
+function updateCounts() {
+  const cats = { all: files.length, doc: 0, xls: 0, img: 0, zip: 0, other: 0 };
+  files.forEach(f => {
+    const c = typeCategory[f.type] || 'other';
+    cats[c] = (cats[c] || 0) + 1;
+  });
+  Object.keys(cats).forEach(k => {
+    const el = document.getElementById('cnt-' + k);
+    if (el) el.textContent = cats[k];
+  });
+  document.getElementById('cnt-all').textContent = files.length;
+}
+
+function filterCategory(cat) {
+  currentFilter = cat;
+  selected.clear();
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  const labels = { all:'全部', doc:'文件', xls:'試算表', img:'圖片', zip:'壓縮檔', other:'其他' };
+  document.getElementById('filter-label').textContent = labels[cat] || cat;
+  render();
+}
+
+function doSearch() {
+  currentSearch = document.getElementById('search-input').value;
+  render();
+}
+
+function sortBy(col) {
+  if (sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  else { sortCol = col; sortDir = 'asc'; }
+  document.querySelectorAll('th').forEach(th => {
+    th.classList.remove('sort-asc','sort-desc');
+  });
+  const th = document.getElementById('th-' + col);
+  if (th) th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+  render();
+}
+
+function toggleAll(cb) {
+  const list = getFiltered();
+  if (cb.checked) list.forEach(f => selected.add(f.id));
+  else selected.clear();
+  render();
+}
+
+function toggleRow(id, cb) {
+  if (cb.checked) selected.add(id);
+  else selected.delete(id);
+  render();
+}
+
+function deleteFile(id) {
+  const f = files.find(x => x.id === id);
+  if (!confirm(`確定要刪除「${f.name}」嗎？`)) return;
+  files = files.filter(x => x.id !== id);
+  selected.delete(id);
+  render();
+  showToast('已刪除：' + f.name, 'danger');
+}
+
+function renameFile(id) {
+  const f = files.find(x => x.id === id);
+  const name = prompt('重新命名', f.name);
+  if (name && name.trim()) {
+    f.name = name.trim();
+    render();
+    showToast('已重新命名');
+  }
+}
+
+function closeOverlay(e) {
+  if (e.target.id === 'overlay') document.getElementById('overlay').classList.remove('show');
+}
+
+let pendingFiles = [];
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag');
+  pendingFiles = Array.from(e.dataTransfer.files);
+  showPending();
+}
+
+function handleFileSelect(input) {
+  pendingFiles = Array.from(input.files);
+  showPending();
+}
+
+function showPending() {
+  const ul = document.getElementById('upload-list');
+  ul.innerHTML = pendingFiles.map(f =>
+    `<div style="padding:4px 0;display:flex;gap:8px;align-items:center;">
+      <span>📄</span><span>${f.name}</span>
+      <span style="margin-left:auto;color:var(--text-muted)">${(f.size/1024/1024).toFixed(2)} MB</span>
+    </div>`
+  ).join('');
+}
+
+function confirmUpload() {
+  if (!pendingFiles.length) { alert('請先選擇檔案'); return; }
+  pendingFiles.forEach(f => {
+    const ext = f.name.split('.').pop().toLowerCase();
+    files.unshift({
+      id: Date.now() + Math.random(),
+      name: f.name,
+      type: ext,
+      size: (f.size/1024/1024).toFixed(2) + ' MB',
+      sizeB: f.size,
+      date: new Date().toISOString().slice(0,10),
+      uploader: '我'
+    });
+  });
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('upload-list').innerHTML = '';
+  pendingFiles = [];
+  render();
+  showToast('✅ 上傳成功！');
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderLeftColor = type === 'danger' ? 'var(--danger)' : 'var(--success)';
+  t.style.color = type === 'danger' ? 'var(--danger)' : 'var(--success)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function toast(msg) { showToast(msg); }
+function toggleView() { showToast('切換視圖功能開發中...'); }
+
+// Init
+render();
+sortBy('date');
+</script>
+</body>
+</html>
